@@ -1,8 +1,12 @@
 .env
 .env.*
 !.env.example
+**/.env
+**/.env.*
+!**/.env.example
 frontend/node_modules/
 frontend/dist/
 backend/target/
 .vscode/
 .idea/
+.DS_Store
