@@ -46,6 +46,8 @@ public class AppUser {
     public UUID getId() { return id; }
     public String getFullName() { return fullName; }
     public String getEmail() { return email; }
+    public void updateFullName(String fullName) { this.fullName = fullName; }
+    public void updatePasswordHash(String passwordHash) { this.passwordHash = passwordHash; }
     public String getPasswordHash() { return passwordHash; }
     public Instant getCreatedAt() { return createdAt; }
 }

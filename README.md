@@ -1,64 +1,49 @@
 # GuitarCare
 
-GuitarCare is a React + Vite frontend with a Spring Boot REST API and Supabase PostgreSQL database.
-
-## Current functionality
-
-- Account registration with server-side validation.
-- BCrypt password hashing (raw passwords are never stored).
-- Login using the registered email and password.
-- Server-managed HTTP session; the browser receives an HttpOnly session cookie.
-- Cookie-based CSRF protection for state-changing requests.
-- Session restoration on page refresh, protected dashboard route, and logout.
-- Supabase database migration for the `public.app_users` table.
-
-The dashboard currently provides an authenticated starting workspace. Guitar inventory and maintenance CRUD features are not present in the supplied source project and have not been represented as completed functionality.
+GuitarCare is a React + Vite frontend with a Spring Boot REST backend and Supabase PostgreSQL database.
 
 ## Requirements
-
 - Java 21
 - Node.js 20 or newer
-- A Supabase PostgreSQL project
+- Supabase PostgreSQL credentials
+- SMTP account for email password recovery
 
-## Database setup
-
-The migration is in `supabase/migrations/20261119000100_create_app_users.sql`.
-
-If the Supabase GitHub integration is enabled for this repository with working directory `.` and production branch `main`, push this migration to `main` and check the integration deployment logs in Supabase. Alternatively, apply the SQL in the Supabase SQL Editor. The migration is idempotent for table creation.
-
-The application connects to PostgreSQL using the Supabase **Session pooler** connection details. The Spring Boot API uses the database role, so the browser must never receive the database password or a Supabase service-role key.
-
-## Run the backend (PowerShell)
-
-From the repository root:
-
+## Backend setup (PowerShell)
 ```powershell
 cd backend
-$env:SUPABASE_DB_URL = "jdbc:postgresql://YOUR-POOLER-HOST:5432/postgres?sslmode=require"
-$env:SUPABASE_DB_USERNAME = "postgres.YOUR-PROJECT-REF"
-$env:SUPABASE_DB_PASSWORD = Read-Host "Supabase database password"
+$env:SUPABASE_DB_URL = "jdbc:postgresql://YOUR_POOLER_HOST:5432/postgres?sslmode=require"
+$env:SUPABASE_DB_USERNAME = "postgres.YOUR_PROJECT_REF"
+$secure = Read-Host "Supabase database password" -AsSecureString
+$env:SUPABASE_DB_PASSWORD = [System.Net.NetworkCredential]::new("", $secure).Password
+$env:MAIL_HOST = "smtp.gmail.com"
+$env:MAIL_PORT = "587"
+$env:MAIL_USERNAME = "your-email@gmail.com"
+$secureMail = Read-Host "Google app password" -AsSecureString
+$env:MAIL_PASSWORD = [System.Net.NetworkCredential]::new("", $secureMail).Password
+$env:APP_PUBLIC_URL = "http://localhost:5174"
 .\mvnw.cmd spring-boot:run
 ```
+Use the Supabase **session pooler** host, port 5432, database `postgres`, and username shown in Supabase Connect. Never commit real credentials. For Gmail, use a Google App Password; do not use your normal account password.
 
-The API runs at `http://localhost:8080`. Check `http://localhost:8080/api/health` for its health response.
-
-## Run the frontend
-
-Open a second terminal from the repository root:
-
+## Frontend setup (second terminal)
 ```powershell
 cd frontend
 npm install
-npm run dev
+npm run dev -- --port 5174
 ```
+Open http://localhost:5174.
 
-Open `http://localhost:5173`. Vite proxies `/api` requests to the Spring Boot backend.
+## Increment 2 features
+- Profile view/update: `GET/PUT /api/account/profile`; server derives the account from the authenticated application session.
+- Change password: `POST /api/account/change-password`; checks current password, confirmation and BCrypt-hashes the replacement. The user must sign in again.
+- Forgot password: `POST /api/account/forgot-password`; sends a 30-minute single-use reset link. Responses do not disclose whether an email exists.
+- Reset password: `POST /api/account/reset-password`; validates token expiry/use, hashes new password and marks token used.
+- Password reset tokens are stored as SHA-256 hashes, not raw tokens.
 
-## Authentication API
+The backend uses Hibernate schema update for local development. The included Supabase migration creates the password reset token table if migrations are managed through the Supabase CLI. Do not run both migration and Hibernate against conflicting schema changes; the SQL table definition matches the entity.
 
-- `POST /api/auth/register` — `{ "fullName": "...", "email": "...", "password": "..." }`
-- `POST /api/auth/login` — `{ "email": "...", "password": "..." }`
-- `GET /api/auth/me` — returns the current session user or HTTP 401.
-- `POST /api/auth/logout` — invalidates the current session.
-
-Keep secrets in local environment variables. Do not commit `.env` files or database credentials.
+## Security and deployment notes
+- Profile endpoints never accept a user ID from the browser; the server uses the session identity.
+- Keep SMTP and database credentials in environment variables.
+- Configure `APP_PUBLIC_URL` to the real HTTPS application URL before deployment.
+- The Vite proxy routes `/api` requests to `http://localhost:8080` in development.

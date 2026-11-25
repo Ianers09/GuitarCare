@@ -49,6 +49,7 @@ export default function Login() {
           {error && <p className="error-message" role="alert">{error}</p>}
           <button className="auth-button" type="submit" disabled={submitting || loading}>{submitting ? "Signing in…" : "Sign In"}</button>
         </form>
+        <p className="auth-footer"><Link to="/forgot-password">Forgot password?</Link></p>
         <p className="auth-footer">Don't have an account? <Link to="/register">Create Account</Link></p>
       </section>
     </main>

@@ -26,7 +26,7 @@ export default function Dashboard() {
         <div className="dashboard-grid">
           <article className="dashboard-tile"><span className="tile-icon"><Guitar /></span><h2>Your guitars</h2><p>Your guitar collection workspace will appear here.</p><span className="tile-status">Ready for setup</span></article>
           <article className="dashboard-tile"><span className="tile-icon"><Music2 /></span><h2>Maintenance</h2><p>Keep track of care routines and maintenance records.</p><span className="tile-status">Coming next</span></article>
-          <article className="dashboard-tile"><span className="tile-icon"><ShieldCheck /></span><h2>Account</h2><p>{user?.email}</p><span className="tile-status">Signed in</span></article>
+          <article className="dashboard-tile"><span className="tile-icon"><ShieldCheck /></span><h2>Account</h2><p>{user?.email}</p><span className="tile-status">Signed in</span><p className="account-links"><a href="/profile">Manage Profile</a> · <a href="/change-password">Change Password</a></p></article>
         </div>
       </section>
     </main>

@@ -1,0 +1,10 @@
+import { useState } from "react";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
+import { Guitar } from "lucide-react";
+import authService from "../services/authService";
+import { getApiError } from "../services/api";
+export default function ResetPassword(){
+ const [params]=useSearchParams();const nav=useNavigate();const [form,setForm]=useState({newPassword:"",confirmPassword:""});const [error,setError]=useState("");const [busy,setBusy]=useState(false);
+ async function submit(e){e.preventDefault();setError("");if(!params.get("token"))return setError("The reset link is missing its token.");if(form.newPassword.length<8)return setError("Password must contain at least 8 characters.");if(form.newPassword!==form.confirmPassword)return setError("Passwords do not match.");setBusy(true);try{await authService.resetPassword({...form,token:params.get("token")});nav("/login",{replace:true})}catch(e){setError(getApiError(e))}finally{setBusy(false)}}
+ return <main className="auth-page"><section className="auth-card"><div className="brand-mark"><Guitar size={22}/></div><h1 className="auth-logo">Reset Password</h1><p className="auth-subtitle">Choose a new password for your GuitarCare account.</p><form className="auth-form" onSubmit={submit}>{[["newPassword","New Password"],["confirmPassword","Confirm New Password"]].map(([name,label])=><div className="form-group" key={name}><label htmlFor={name}>{label}</label><input id={name} name={name} type="password" minLength={8} value={form[name]} onChange={e=>setForm({...form,[name]:e.target.value})} required/></div>)}{error&&<p className="error-message">{error}</p>}<button className="auth-button" disabled={busy}>{busy?"Resetting…":"Reset Password"}</button></form><p className="auth-footer"><Link to="/login">Back to Sign In</Link></p></section></main>
+}
