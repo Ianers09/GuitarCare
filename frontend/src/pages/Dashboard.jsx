@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Guitar, LogOut, Music2, ShieldCheck } from "lucide-react";
+import { CalendarDays, Guitar, LogOut, ShieldCheck } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
 
 export default function Dashboard() {
@@ -22,10 +22,10 @@ export default function Dashboard() {
       <section className="dashboard-content">
         <p className="eyebrow">YOUR WORKSPACE</p>
         <h1>Welcome, {user?.fullName || "guitarist"}.</h1>
-        <p className="dashboard-lead">Your GuitarCare account is connected and ready.</p>
+        <p className="dashboard-lead">Manage your instruments and keep their maintenance on track.</p>
         <div className="dashboard-grid">
-          <article className="dashboard-tile"><span className="tile-icon"><Guitar /></span><h2>Your guitars</h2><p>Your guitar collection workspace will appear here.</p><span className="tile-status">Ready for setup</span></article>
-          <article className="dashboard-tile"><span className="tile-icon"><Music2 /></span><h2>Maintenance</h2><p>Keep track of care routines and maintenance records.</p><span className="tile-status">Coming next</span></article>
+          <article className="dashboard-tile"><span className="tile-icon"><Guitar /></span><h2>Your guitars</h2><p>Register instruments, update their details, and keep your collection organized.</p><a className="tile-status" href="/guitars">Open guitar collection →</a></article>
+          <article className="dashboard-tile"><span className="tile-icon"><CalendarDays /></span><h2>Maintenance</h2><p>Record service activities, review maintenance history, and plan upcoming care.</p><a className="tile-status" href="/guitars">Manage maintenance →</a></article>
           <article className="dashboard-tile"><span className="tile-icon"><ShieldCheck /></span><h2>Account</h2><p>{user?.email}</p><span className="tile-status">Signed in</span><p className="account-links"><a href="/profile">Manage Profile</a> · <a href="/change-password">Change Password</a></p></article>
         </div>
       </section>
